@@ -12,6 +12,7 @@ public class InMemoryTimeEntryRepository implements TimeEntryRepository{
     public TimeEntry create(TimeEntry newTimeEntry){
         id +=1;
         newTimeEntry.setId(id);
+
         timeEntryMap.put(id, newTimeEntry);
         return newTimeEntry;
     }

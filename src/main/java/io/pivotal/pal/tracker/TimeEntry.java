@@ -74,11 +74,12 @@ public class TimeEntry {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         TimeEntry timeEntry = (TimeEntry) o;
-        return id == timeEntry.id &&
-                projectId == timeEntry.projectId &&
-                userId == timeEntry.userId &&
-                hours == timeEntry.hours &&
-                Objects.equals(date, timeEntry.date);
+//        return id == timeEntry.id &&
+//                projectId == timeEntry.projectId &&
+//                userId == timeEntry.userId &&
+//                hours == timeEntry.hours &&
+//                Objects.equals(date, timeEntry.date);
+        return this.hashCode() == o.hashCode();
     }
 
     @Override
