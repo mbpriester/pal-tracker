@@ -8,9 +8,9 @@ public interface TimeEntryRepository {
 
     List<TimeEntry> list();
 
-    TimeEntry find(long id);
+    TimeEntry find(Long id);
 
-    TimeEntry update(long id, TimeEntry toBeUpdated);
+    TimeEntry update(Long id, TimeEntry toBeUpdated);
 
-    void delete(long id);
+    void delete(Long id);
 }

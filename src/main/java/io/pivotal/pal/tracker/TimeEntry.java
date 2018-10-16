@@ -4,24 +4,24 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 public class TimeEntry {
-    private long id;
+    private Long id;
 
-    private long projectId;
-    private long userId;
+    private Long projectId;
+    private Long userId;
     private LocalDate date;
-    private int hours;
+    private Integer hours;
 
     public TimeEntry(){
     }
 
-    public TimeEntry(long projectId, long userId, LocalDate date, int hours){
+    public TimeEntry(Long projectId, Long userId, LocalDate date, Integer hours){
         this.projectId = projectId;
         this.userId = userId;
         this.date = date;
         this.hours = hours;
     }
 
-    public TimeEntry(long id, long projectId, long userId, LocalDate date, int hours){
+    public TimeEntry(Long id, Long projectId, Long userId, LocalDate date, Integer hours){
         this.id = id;
         this.projectId = projectId;
         this.userId = userId;
@@ -29,27 +29,27 @@ public class TimeEntry {
         this.hours = hours;
     }
 
-    public long getId(){
+    public Long getId(){
         return id;
     }
 
-    public void setId(long id){
+    public void setId(Long id){
         this.id = id;
     }
 
-    public long getProjectId() {
+    public Long getProjectId() {
         return projectId;
     }
 
-    public void setProjectId(long projectId) {
+    public void setProjectId(Long projectId) {
         this.projectId = projectId;
     }
 
-    public long getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 
@@ -61,11 +61,11 @@ public class TimeEntry {
         this.date = date;
     }
 
-    public int getHours() {
+    public Integer getHours() {
         return hours;
     }
 
-    public void setHours(int hours) {
+    public void setHours(Integer hours) {
         this.hours = hours;
     }
 

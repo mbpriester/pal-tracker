@@ -1,13 +1,15 @@
 package io.pivotal.pal.tracker;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
+@RequestMapping("/time-entries")
 public class TimeEntryController {
     private TimeEntryRepository timeEntryRepository;
 
@@ -15,7 +17,8 @@ public class TimeEntryController {
         this.timeEntryRepository = timeEntryRepository;
     }
 
-    public ResponseEntity create(TimeEntry timeEntryToCreate) {
+    @PostMapping
+    public ResponseEntity create(@RequestBody TimeEntry timeEntryToCreate) {
         ResponseEntity<TimeEntry> response;
 
         TimeEntry created = timeEntryRepository.create(timeEntryToCreate);
@@ -25,7 +28,8 @@ public class TimeEntryController {
         return ResponseEntity.noContent().build();
     }
 
-    public ResponseEntity<TimeEntry> read(long id) {
+    @GetMapping("/{id}")
+    public ResponseEntity<TimeEntry> read(@PathVariable("id") Long id) {
         TimeEntry found = timeEntryRepository.find(id);
         if(found != null)
             return ResponseEntity.ok(found);
@@ -33,6 +37,7 @@ public class TimeEntryController {
         return ResponseEntity.notFound().build();
     }
 
+    @GetMapping
     public ResponseEntity<List<TimeEntry>> list() {
         List<TimeEntry> listOfTimeEntries = null;
         listOfTimeEntries = timeEntryRepository.list();
@@ -40,7 +45,8 @@ public class TimeEntryController {
         return ResponseEntity.ok(listOfTimeEntries);
     }
 
-    public ResponseEntity<TimeEntry> update(long id, TimeEntry expected) {
+    @PutMapping("/{id}")
+    public ResponseEntity<TimeEntry> update(@PathVariable Long id, @RequestBody TimeEntry expected) {
         TimeEntry updated = timeEntryRepository.update(id, expected);
 
         if(updated != null && updated.getId() == id)
@@ -50,7 +56,8 @@ public class TimeEntryController {
 
     }
 
-    public ResponseEntity<TimeEntry> delete(long id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<TimeEntry> delete(@PathVariable Long id) {
         timeEntryRepository.delete(id);
 
         return ResponseEntity.noContent().build();
