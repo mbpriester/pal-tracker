@@ -1,5 +1,7 @@
 package io.pivotal.pal.tracker;
 
+import org.springframework.boot.actuate.metrics.CounterService;
+import org.springframework.boot.actuate.metrics.GaugeService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -9,56 +11,64 @@ import java.util.List;
 @RestController
 @RequestMapping("/time-entries")
 public class TimeEntryController {
-    private TimeEntryRepository timeEntryRepository;
 
-    public TimeEntryController(TimeEntryRepository timeEntryRepository){
-        this.timeEntryRepository = timeEntryRepository;
+    private final CounterService counter;
+    private final GaugeService gauge;
+    private TimeEntryRepository timeEntriesRepo;
+
+    public TimeEntryController(
+            TimeEntryRepository timeEntriesRepo,
+            CounterService counter,
+            GaugeService gauge
+    ) {
+        this.timeEntriesRepo = timeEntriesRepo;
+        this.counter = counter;
+        this.gauge = gauge;
     }
 
     @PostMapping
-    public ResponseEntity create(@RequestBody TimeEntry timeEntryToCreate) {
-        ResponseEntity<TimeEntry> response;
+    public ResponseEntity<TimeEntry> create(@RequestBody TimeEntry timeEntry) {
+        TimeEntry createdTimeEntry = timeEntriesRepo.create(timeEntry);
+        counter.increment("TimeEntry.created");
+        gauge.submit("timeEntries.count", timeEntriesRepo.list().size());
 
-        TimeEntry created = timeEntryRepository.create(timeEntryToCreate);
-        if (created != null)
-            return ResponseEntity.status(HttpStatus.CREATED).body(created);
-
-        return ResponseEntity.noContent().build();
+        return new ResponseEntity<>(createdTimeEntry, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<TimeEntry> read(@PathVariable("id") Long id) {
-        TimeEntry found = timeEntryRepository.find(id);
-        if(found != null)
-            return ResponseEntity.ok(found);
-
-        return ResponseEntity.notFound().build();
+    @GetMapping("{id}")
+    public ResponseEntity<TimeEntry> read(@PathVariable Long id) {
+        TimeEntry timeEntry = timeEntriesRepo.find(id);
+        if (timeEntry != null) {
+            counter.increment("TimeEntry.read");
+            return new ResponseEntity<>(timeEntry, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
     @GetMapping
     public ResponseEntity<List<TimeEntry>> list() {
-        List<TimeEntry> listOfTimeEntries = null;
-        listOfTimeEntries = timeEntryRepository.list();
-
-        return ResponseEntity.ok(listOfTimeEntries);
+        counter.increment("TimeEntry.listed");
+        return new ResponseEntity<>(timeEntriesRepo.list(), HttpStatus.OK);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<TimeEntry> update(@PathVariable Long id, @RequestBody TimeEntry expected) {
-        TimeEntry updated = timeEntryRepository.update(id, expected);
-
-        if(updated != null && updated.getId() == id)
-            return ResponseEntity.ok(updated);
-
-        return ResponseEntity.notFound().build();
-
+    @PutMapping("{id}")
+    public ResponseEntity<TimeEntry> update(@PathVariable Long id, @RequestBody TimeEntry timeEntry) {
+        TimeEntry updatedTimeEntry = timeEntriesRepo.update(id, timeEntry);
+        if (updatedTimeEntry != null) {
+            counter.increment("TimeEntry.updated");
+            return new ResponseEntity<>(updatedTimeEntry, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("{id}")
     public ResponseEntity<TimeEntry> delete(@PathVariable Long id) {
-        timeEntryRepository.delete(id);
+        timeEntriesRepo.delete(id);
+        counter.increment("TimeEntry.deleted");
+        gauge.submit("timeEntries.count", timeEntriesRepo.list().size());
 
-        return ResponseEntity.noContent().build();
-
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 }
